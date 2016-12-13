@@ -27,6 +27,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
+
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
@@ -175,6 +177,7 @@ public class RxBluetooth {
             final BroadcastReceiver receiver = new BroadcastReceiver() {
               @Override public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
+                Log.d("RXBLUTOOTH", "onReceive: " + action.toString());
                 if (action.equals(BluetoothDevice.ACTION_FOUND)) {
                   BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                   subscriber.onNext(device);
@@ -368,7 +371,7 @@ public class RxBluetooth {
           @Override public void call(Subscriber<? super BluetoothSocket> subscriber) {
             try {
               BluetoothServerSocket bluetoothServerSocket =
-                  mBluetoothAdapter.listenUsingRfcommWithServiceRecord(name, uuid);
+                  mBluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(name, uuid);
               subscriber.onNext(bluetoothServerSocket.accept());
               bluetoothServerSocket.close();
             } catch (IOException e) {
@@ -396,7 +399,7 @@ public class RxBluetooth {
           @Override public void call(Subscriber<? super BluetoothSocket> subscriber) {
             try {
               BluetoothSocket bluetoothSocket =
-                  bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
+                  bluetoothDevice.createInsecureRfcommSocketToServiceRecord(uuid);
               bluetoothSocket.connect();
               subscriber.onNext(bluetoothSocket);
             } catch (IOException e) {
